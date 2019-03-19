@@ -37,7 +37,7 @@ Matrix createLayer(int inputs, int neurons);
 
 static int iterations = 10000;
 static double sensitivity = .01;
-static double momentum = .1;
+static double momentum = .25;
 
 int main()
 {
@@ -62,18 +62,23 @@ int main()
 
   Matrix trainData;
   trainData = rawData.seriesSampleCol(0, step, stride);
-  Matrix normData = trainData.normalizeCols();
+  
   //2 for this assignment
   int layers = 2;
 
   //Creating a matrix which separates the inputs and outputs of the training data
   Matrix trainDataInputs = trainData.subMatrix(0, 0, trainData.numRows(), step);
+  Matrix normData = trainDataInputs.normalizeCols();
   Matrix trainDataOutputs = trainData.subMatrix(0, step, trainData.numRows(), trainData.numCols()-step);
+  trainDataOutputs.normalizeCols(normData);
+
+  trainData.insert(trainDataInputs, 0, 0);
+  trainData.insert(trainDataOutputs, 0, step);
+  trainData.printfmt("Sampled Normalized Input:");
   
   //Adding a bias
   Matrix trainAndBias = new Matrix(trainDataInputs.numRows(),trainDataInputs.numCols()+1, -1.0);
   trainAndBias.insert(trainDataInputs, 0, 0);
-  trainAndBias.print();
   
   //Next we're going to train on the test data (matrix 1)
 
@@ -112,20 +117,18 @@ int main()
   //calculating with test data
   activations[0] = computeLayer(weights[0], trainAndBias, 0, layers);
   activations[1] = computeLayer(weights[1], activations[0], 1, layers);
-
-  trainAndBias.insert(activations[1], 0, step);
   
-  trainAndBias.unnormalizeCols(normData);
+  activations[1].unnormalizeCols(normData);
   trainDataOutputs.unnormalizeCols(normData);
   
   Matrix finalOut = new Matrix(trainDataOutputs.numRows(), 2, 0.0);
-  finalOut.insert(trainDataOutputs, 0, 0);
-  finalOut.insert(trainAndBias.subMatrix(0, step, trainAndBias.numRows(), step-1), 0, 1);
-  finalOut.print();
+  finalOut.insert(trainDataOutputs, 0, 1);
+  finalOut.insert(activations, 0, 0);
 
-  printf("Sum of distances:\n");
-  double dist = trainDataOutputs.dist2(trainAndBias.subMatrix(0, step, trainAndBias.numRows(), step-1));
-  printf("%f \n", dist);
+  finalOut.printfmt("Est. and Target");
+
+  double dist = trainDataOutputs.dist2(activations[1]);
+  printf("Dist: %f\n", dist);
 
   return 0;
 }

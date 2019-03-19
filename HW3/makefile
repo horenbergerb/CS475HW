@@ -2,7 +2,7 @@
 BIN=nn
 
 # what you want to name your tar/zip file:
-TARNAME=mat31C
+TARNAME=HW3
 CXX=g++
 
 CXXFLAGS=-O3 -Wall   # optimize
