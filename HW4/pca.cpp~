@@ -1,0 +1,10 @@
+/*
+What's the planiel, staniel?
+
+take in R samples of C-dimensional vectors (an image in RxC)
+Center columns about the mean
+Use PCA
+Compare the sizes of encoded and decoded
+Do sum of squares between original and new pixels
+save the new file as z.ppm or z.pgm (depending on whether the image is in color)
+ */
