@@ -36,8 +36,8 @@ void updateWeights(Matrix* weights, Matrix inputs, Matrix* activation, Matrix ta
 Matrix createLayer(int inputs, int neurons);
 
 static int iterations = 10000;
-static double sensitivity = .01;
-static double momentum = .25;
+static double sensitivity = .1;
+static double momentum = .3;
 
 int main()
 {
@@ -55,10 +55,7 @@ int main()
   Matrix rawData;
   rawData.read();
 
-  //Matrix normData = trainData.normalizeCols();
-
-  //Matrix newData = new Matrix(rows, step+1);
-  //newData.insertRowVector(x, extractStride(0, 0, stride, 0));
+  Matrix normData = rawData.normalizeCols();
 
   Matrix trainData;
   trainData = rawData.seriesSampleCol(0, step, stride);
@@ -68,9 +65,7 @@ int main()
 
   //Creating a matrix which separates the inputs and outputs of the training data
   Matrix trainDataInputs = trainData.subMatrix(0, 0, trainData.numRows(), step);
-  Matrix normData = trainDataInputs.normalizeCols();
   Matrix trainDataOutputs = trainData.subMatrix(0, step, trainData.numRows(), trainData.numCols()-step);
-  trainDataOutputs.normalizeCols(normData);
 
   trainData.insert(trainDataInputs, 0, 0);
   trainData.insert(trainDataOutputs, 0, step);
@@ -123,7 +118,7 @@ int main()
   
   Matrix finalOut = new Matrix(trainDataOutputs.numRows(), 2, 0.0);
   finalOut.insert(trainDataOutputs, 0, 1);
-  finalOut.insert(activations, 0, 0);
+  finalOut.insert(activations[1], 0, 0);
 
   finalOut.printfmt("Est. and Target");
 
@@ -139,7 +134,7 @@ double stepFunc(double x){
 }
 
 double activationFunc(double x){
-  return 1.0/(1.0+exp(-4.0*x));
+  return 1.0/(1.0+exp(-1.0*x));
 }
 
 Matrix computeLayer(Matrix weights, Matrix layerInputs, int curLayer, int layers){

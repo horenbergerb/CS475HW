@@ -1,7 +1,7 @@
 #ifndef MATH
 #define MATH
 
-// // // // // // // // // // // // // // // // 
+// // // // // // // // // // // // // // // //
 //
 // Some simple matrix operators.
 //
@@ -22,19 +22,19 @@
 // comment block.
 //
 // Author: Dr. Robert B. Heckendorn, University of Idaho
-// Version: 3.4W
-// Date: Feb 27, 2019
+// Version: 3.7W
+// Date: Mar 19, 2019
 //
 // You are free to use, change, or redistribute the code in any way
 // you wish for non-commercial purposes, but please maintain the name
-// of the original author. This code is not guarantteed to function
+// of the original author. This code is not guaranteed to function
 // correctly and comes with no warranty of any kind for any purpose
 // what-so-ever and is NOT SUPPORTED.   Good luck and have fun.
 
 // IMPORTANT: If running on MICROSOFT WINDOWS uncomment this define statement!
 // #define WINDOWS
 
-// 
+//
 // WARNING: Most matrix library routines REPLACE the contents of the matrix
 // object (overwrite self).  That is: X.sub(Y) will replace X with X - Y.
 // Rule 1: If the routine returns "Matrix &" then it probably modifies the matrix.
@@ -45,7 +45,7 @@
 // matrix untouched.  For these routines you often need to assign the result
 // to a new matrix: X = Y.dot(Z)
 // or print them out: Y.dot(Z).print()
-// 
+//
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -62,7 +62,7 @@ class Matrix;
 // helper function
 int bitCount(unsigned int w);
 
-// // // // // // // // // // // // // // // // 
+// // // // // // // // // // // // // // // //
 //
 // class MatrixRowIter
 //
@@ -88,7 +88,7 @@ public:
 
 
 
-// // // // // // // // // // // // // // // // 
+// // // // // // // // // // // // // // // //
 //
 // class Matrix
 //
@@ -130,7 +130,7 @@ public:
     Matrix(int r, int c, std::string namex="");
     Matrix(int r, int c, double initValue, std::string namex="");   // create and initialize
     Matrix(int r, int c, double *data, std::string namex="");       // create and initialize from array
-    Matrix(const Matrix &other, std::string namex="");              // copy constructor
+    Matrix(const Matrix &other, std::string namex="");              // real copy constructor
     Matrix(Matrix *other);                                          // for convenience
     ~Matrix();
     Matrix &operator=(const Matrix &other);
@@ -159,7 +159,7 @@ public:  // auxillary routines but not private (for speed, they do not check sel
     bool lessRows(int i, int j) const;            // utility to compare two rows
 
 // accessors
-public: 
+public:
     int numRows() const { return maxr; }
     int numCols() const { return maxc; }
     double get(int r, int c) const;      // get element value
@@ -175,7 +175,7 @@ public:
     void lengthen(int newc, double fill=0.0); // lengthen the matrix filling with constant
 
 // Boolean tests
-public: 
+public:
     bool isDefined() const { return defined; }               // return true if defined
     bool isRowVector() const { return defined && maxr==1; }  // exactly one row
     bool isColVector() const { return defined && maxc==1; }  // exactly one col
@@ -183,7 +183,7 @@ public:
     bool nearEqual(double epsilon, const Matrix &other) const; // matrices nearly equal?
 
 // basic properties
-public:    
+public:
     int countGreater(const Matrix &other) const; // count number of elements >
     void argMax(int &r, int &c) const;           // what location is the largest in whole array
     void argMin(int &r, int &c) const;           // what location is the smallest in whole array
@@ -200,7 +200,7 @@ public:
     double stddevCol(int c) const;               // standard deviation in a column
     int countEqCol(int c, double value) const;   // count number of items in column c equal to value
     int countNeqCol(int c, double value) const;  // count number of items in column c not equal to value
-    double dot(int r, int c, const Matrix &other) const;  // dot of row of this with col of other -> double 
+    double dot(int r, int c, const Matrix &other) const;  // dot of row of this with col of other -> double
 
     // lengths and distances (beware that some distances are squares of distances
     double sum() const;                          // sums up elements in the matrix
@@ -220,6 +220,7 @@ public:
     Matrix &rowInc(int r);          // increment the values in a given row by 1
 
     // initialize to constants (obviously modifies self)
+    Matrix &zero();                        // zero a matrix (just reads nice)
     Matrix &constant(double x);            // this can be used to zero a matrix
     Matrix &constantDiagonal(double x);    // this can be used to set the diagonal to a constant but does set rest of matrix
     Matrix &constantCol(int c, double x);  // this can be used to zero a column
@@ -230,14 +231,15 @@ public:
     // (obviously modifies self)
     Matrix &randCol(int c, double min, double max);  // random reals in given column
     Matrix &randNorm(double mean, double stddev);    // random reals in normal distribution
-    Matrix &rand(double min, double max);            // random reals in range 
+    Matrix &rand(double min, double max);            // random reals in range
     Matrix &rand(int min, int max);                  // random ints in range (doesn't include max)
 
     // initialization by formula (obviously modifies self)
     Matrix &initLinear(double A, double B, double C); // init m[r][c] = A*r + B*c + C;
 
     // scalar operators (modifies self)
-    Matrix &scalarMul(double x);          // multiply all elements by x
+    Matrix &scalarMul(double x);           // multiply all elements by x
+    Matrix &scalarDiv(double x);           // divide all elements by x
     Matrix &scalarAdd(double x);           // add to all elements x
     Matrix &scalarPreSub(double x);        // NOTE: this is x - self   not   self - x, can be used to negate
     Matrix &scalarPostSub(double x);       // NOTE: this is self - x
@@ -251,7 +253,7 @@ public:
     Matrix &addRowVector(const Matrix &other);  // self[r] + (row vector other) for each row
     Matrix &subRowVector(const Matrix &other);  // self[r] - (row vector other) for each row
     Matrix &addRowVector(int r, const Matrix &other); // add row vector matrix in other to the given row of self
-    
+
     // min/max normalization by columns (MODIFIES SELF)
     void normalize();                             // normalize matrix so values fall between 0 and 1
     Matrix normalizeCols();                       // normalize columns in place and return array of min and max of each col
@@ -265,11 +267,12 @@ public:
     // creates new matrix
     Matrix mapCol(double (*f)(int size, double *x)); // apply function to each column -> one double
     Matrix mapRow(double (*f)(int size, double *x)); // apply function to each row -> one double
-    Matrix cartesianRow(double (*)(int, double*, double*), Matrix&);  // apply given function to the cartesian product of two vectors of row vectors
+    Matrix cartesianRow(double (*)(int, double*, double*), const Matrix &other);  // apply given function to the cartesian product of two vectors of row vectors
     Matrix seriesSampleCol(int col, int numsteps, int stride);   // sample a column as if a time series
 
     // random actions
-    Matrix &sample(Matrix &out);  // extract random rows with replacement into existing matrix out
+    Matrix &sample(Matrix &data);  // extract random rows from data WITH REPLACEMENT into self
+    Matrix &sampleWithout(Matrix &data);  // extract random rows from data WITHOUT REPLACEMENT into self
     Matrix &shuffle();            // randomly shuffle the rows (changes self)
 
     // insertion and extraction
@@ -278,7 +281,7 @@ public:
     Matrix &insertRowVector(int row, const Matrix&);
     Matrix pickRows(int match, const Matrix &list);   // pick rows i in which list[i]==match
     Matrix joinRight(Matrix &other);                 // joins other to the right of self giving new matrix
-    
+
     // input/output
     Matrix &printfmt(std::string msg="", std::string fmt=realFormat, bool size=false);  // print matrix and optionally a msg with numbers in given format and with or without size
     Matrix &print(std::string msg="");         // print matrix and its name (returns arg for pipes)
@@ -298,7 +301,7 @@ private:
 #ifdef WALSH
 #include "matwalsh.h"
 #endif
-    
+
 public:
     // WARNING: The following *CONSTRUCT TO NEW MATRIX* for the answer  (BEWARE MEMORY LEAKS!)
     // WARNING: the result of these functions should be used somewhere like in an assignment
@@ -325,7 +328,7 @@ public:
     // eigenSystem() destroys self by replacing self with eigenvectors in rows.
     // Returns a new matrix with the eigenvalues in it.
     // Eigenvalues and vectors returned sorted from largest magnitude to smallest
-    // WARNING: allocates new matrix for answer
+    // WARNING: allocates new matrix for eigenvectors
     void tridiagonalize(double *&d, double *&e);
     Matrix eigenSystem();
 
@@ -337,33 +340,36 @@ private:
     void qsCol(int c, int lower, int upper);
 
     // sorting
-public: 
-    void sortRows();                            // sort rows in place
-    void sortRows(int startRow, int endRow);    // sort rows in place in a range of rows
-    void sortRowsByCol(int c);                  // sort rows in place on given column
-    void sortRowsByCol(int c, int startRow, int endRow);     // sort rows in place in a range of rows
+public:
+    Matrix & sortRows();                            // sort rows in place
+    Matrix & sortRows(int startRow, int endRow);    // sort rows in place in a range of rows
+    Matrix & sortRowsByCol(int c);                  // sort rows in place on given column
+    Matrix & sortRowsByCol(int c, int startRow, int endRow);     // sort rows in place in a range of rows
 
 public:
     // subMatrices are here for EFFICIENCY for creating submatrices by pointing into
     // the parent matrix rather than copying all the contents of the matrix.
     // READ THE WARNINGS in the .cpp file
-    // 
+    //
     Matrix subMatrix(int minr, int minc, int sizer, int sizec) const;  // create a submatrix whose corner is (minr, minc) and size given
     Matrix subMatrixEq(int c, double value) const;         // create submatrix with rows whose column c has the given value
     Matrix subMatrixNeq(int c, double value) const;        // create submatrix with rows whose column c does not have the given value
+    Matrix subMatrixPickRows(int match, const Matrix &list);  // pick rows i in self for which list[i]==match
 
     // image (picture) support (currently only supports 8 bit pgm and ppm formats)
     // output is in ascii formats (zzz: fix someday to use more compressed output)
     // 8 bit gray is one integer in the range 0-255 for each pixel
     // 8 bit color is three integers in a row in the range 0-255 for RGB in each pixel.
     // That is an 8 bit color square 100x100 pixels gens a 100x300 dimensional array
+    // The parameter in the format for maximum pixel value is currently not used.
 private:
     int byteValue(double x);
-    Matrix readImage(char *expectedType, char *caller, std::string filename, std::string namex);
+    Matrix &readImage(std::string expectedType, std::string caller, std::string filename, std::string namex, bool &isColor);
 
-public: 
-    Matrix readImagePgm(std::string filename, std::string namex);   // read a P2 or P5 pgm  (8 bit gray scale) file into self
-    Matrix readImagePpm(std::string filename, std::string namex);   // read a P3 or P6 ppm  (8 bit color)
+public:
+    Matrix &readImagePixmap(std::string filename, std::string namex, bool &isColor);   // read P2, P3, P5, or P6 pixmap files
+    Matrix &readImagePgm(std::string filename, std::string namex);   // read a P2 or P5 pgm  (8 bit gray scale) file into self
+    Matrix &readImagePpm(std::string filename, std::string namex);   // read a P3 or P6 ppm  (8 bit color)
     void writeImagePgm(std::string filename, std::string comment);  // write a P2 pgm file  (8 bit gray scale)
     void writeImagePpm(std::string filename, std::string comment);  // write a P3 pgm file (8 bit color)
 };

@@ -1,8 +1,8 @@
 # Example makefile for using the mat libraries
-BIN=nn
+BIN=kmeans
 
 # what you want to name your tar/zip file:
-TARNAME=mat31C
+TARNAME=HW5
 CXX=g++
 
 CXXFLAGS=-O3 -Wall   # optimize
@@ -14,7 +14,6 @@ EXAMPLES=
 EXTRAS=\
 randf.cpp\
 randmt.cpp\
-testData
 
 SRCS=\
 $(BIN).cpp\
@@ -30,16 +29,20 @@ $(BIN).o\
 mat.o\
 rand.o
 
-all: $(BIN) nnoneof
+all: $(BIN) kmeansp
 
 $(BIN): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) $(LIBS) -o $(BIN)
+
+kmeansp: kmeansp.o mat.o rand.o
+	$(CXX) $(CXXFLAGS) kmeansp.o mat.o rand.o $(LIBS) -o kmeansp
+
 
 clean:
 	/bin/rm -f *.o $(BIN)*.tar *~ core gmon.out a.out
 
 tar:
-	tar -cvf $(TARNAME).tar makefile $(EXAMPLES) $(SRCS) $(HDRS) $(EXTRAS)
+	tar -cvf $(TARNAME).tar makefile $(EXAMPLES) $(SRCS) $(HDRS) $(EXTRAS) kmeansp.cpp
 	ls -l $(TARNAME).tar
 
 zip:

@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <iostream>
+#include "rand.h"
+#include "mat.h"
+
+int main(int argc, char* argv[]){
+  //takes two inputs:
+  //k: Number of expect groups
+  //t: number of times kmeans runs
+  if(argc == 3){
+
+  }
+  else{
+    printf("You messed up\n");
+    exit(0);
+  }
+
+  //Here we read using the same method as the last assigmnet
+  FILE *proxyFile;
+  void *content = malloc(sizeof(char)*100);
+  int read;
+  proxyFile = fopen("proxyFile.txt", "w");
+  while((read = fread(content, 1, sizeof(char)*100, stdin)))
+    fwrite(content, read, 1, proxyFile);
+  fclose(proxyFile);
+
+  
+
+  //Cleaning up our proxy file
+  remove("proxyFile.txt");
+  
+}
